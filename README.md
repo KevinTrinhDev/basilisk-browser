@@ -71,10 +71,9 @@ you a distinct binary you can hand to someone else, open source and all.
 
 ## Roadmap
 
-- [x] Tier 1: policy/pref hardening, install scripts (Linux, Windows)
+- [x] Tier 1: policy/pref hardening, install scripts (Linux, Windows, macOS)
 - [ ] BASILISK Browser branding/icon set (design work)
 - [ ] First real tier-2 build (needs a self-hosted/larger CI runner)
-- [ ] macOS install script (tier 1)
 - [ ] Firefox for Android fork (same GeckoView approach as Fennec/Focus
       forks). Feasible, not started. iOS isn't possible: Apple restricts
       iOS/iPadOS to WebKit-based extensions only, which rules out this
