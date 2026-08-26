@@ -1,0 +1,6 @@
+firefox-src/
+obj-basilisk-browser/
+*.tar.bz2
+*.dmg
+*.exe
+.DS_Store

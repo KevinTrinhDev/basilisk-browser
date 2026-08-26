@@ -1,0 +1,91 @@
+{
+  "policies": {
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DisableFirefoxAccounts": false,
+    "DisableSetDesktopBackground": false,
+    "DontCheckDefaultBrowser": true,
+    "NoDefaultBookmarks": true,
+    "OfferToSaveLogins": false,
+    "PasswordManagerEnabled": false,
+    "DisableFormHistory": false,
+    "DisableFeedbackCommands": true,
+    "DisablePasswordReveal": false,
+    "SanitizeOnShutdown": {
+      "Cache": true,
+      "Cookies": false,
+      "Downloads": false,
+      "FormData": false,
+      "History": false,
+      "Sessions": false,
+      "SiteSettings": false,
+      "OfflineApps": true
+    },
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": false,
+      "Cryptomining": true,
+      "Fingerprinting": true,
+      "EmailTracking": true
+    },
+    "FirefoxHome": {
+      "Search": true,
+      "TopSites": false,
+      "SponsoredTopSites": false,
+      "Highlights": false,
+      "Pocket": false,
+      "SponsoredPocket": false,
+      "Snippets": false,
+      "Locked": false
+    },
+    "UserMessaging": {
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false,
+      "Locked": false
+    },
+    "DNSOverHTTPS": {
+      "Enabled": true,
+      "ProviderURL": "https://mozilla.cloudflare-dns.com/dns-query",
+      "Locked": false
+    },
+    "Preferences": {
+      "privacy.resistFingerprinting": { "Value": true, "Status": "default" },
+      "privacy.trackingprotection.enabled": { "Value": true, "Status": "default" },
+      "privacy.trackingprotection.socialtracking.enabled": { "Value": true, "Status": "default" },
+      "privacy.donottrackheader.enabled": { "Value": true, "Status": "default" },
+      "privacy.firstparty.isolate": { "Value": true, "Status": "default" },
+      "network.cookie.cookieBehavior": { "Value": 5, "Status": "default" },
+      "browser.contentblocking.category": { "Value": "strict", "Status": "default" },
+      "toolkit.telemetry.enabled": { "Value": false, "Status": "locked" },
+      "toolkit.telemetry.unified": { "Value": false, "Status": "locked" },
+      "datareporting.healthreport.uploadEnabled": { "Value": false, "Status": "locked" },
+      "datareporting.policy.dataSubmissionEnabled": { "Value": false, "Status": "locked" },
+      "app.shield.optoutstudies.enabled": { "Value": false, "Status": "locked" },
+      "browser.newtabpage.activity-stream.feeds.telemetry": { "Value": false, "Status": "locked" },
+      "browser.ping-centre.telemetry": { "Value": false, "Status": "locked" },
+      "beacon.enabled": { "Value": false, "Status": "default" },
+      "browser.send_pings": { "Value": false, "Status": "default" }
+    },
+    "ExtensionSettings": {
+      "sidebar-extension@basilisk.dev": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://github.com/KevinTrinhDev/basilisk/releases/latest/download/basilisk.xpi"
+      }
+    },
+    "Homepage": {
+      "URL": "about:blank",
+      "Locked": false,
+      "StartPage": "homepage"
+    },
+    "SearchEngines": {
+      "Default": "DuckDuckGo",
+      "PreventInstalls": false
+    },
+    "PopupBlocking": { "Default": true, "Locked": false },
+    "InstallAddonsPermission": { "Default": true }
+  }
+}

@@ -1,0 +1,33 @@
+# BASILISK Browser mozconfig — used against a mozilla-central / Firefox ESR
+# checkout by .github/workflows/build.yml (see that file for the actual
+# clone+patch+build sequence). Based on the same category of flags LibreWolf
+# and Mullvad Browser ship; trimmed to what's needed for a hardened,
+# rebranded release build.
+
+ac_add_options --enable-application=browser
+ac_add_options --enable-release
+ac_add_options --enable-optimize
+ac_add_options --enable-hardening
+ac_add_options --enable-rust-simd
+ac_add_options --disable-debug
+ac_add_options --disable-tests
+
+# Rebrand: points the build at branding/basilisk-browser instead of
+# Firefox's official branding (which is legally restricted to Mozilla — see
+# branding/basilisk-browser/README.md for why this directory has to exist
+# and be filled in with real, non-Mozilla-trademarked assets before this
+# mozconfig can produce a distributable build).
+ac_add_options --with-branding=browser/branding/basilisk-browser
+ac_add_options --with-app-name=basilisk-browser
+ac_add_options --with-app-basename=BasiliskBrowser
+
+# Telemetry / data collection off at compile time (belt-and-suspenders with
+# policy/policies.json, which handles this at runtime for stock Firefox too)
+ac_add_options MOZ_TELEMETRY_REPORTING=
+ac_add_options MOZ_SERVICES_HEALTHREPORT=
+ac_add_options MOZ_CRASHREPORTER=
+ac_add_options MOZ_DATA_REPORTING=
+
+# Default preferences baked into the binary — pref/user.js still layers on
+# top of these for anything not exposed here.
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/obj-basilisk-browser

@@ -1,0 +1,68 @@
+name: Build BASILISK Browser (tier 2 — full source build)
+
+# Manual trigger only, deliberately — this is NOT something to run on every
+# push. A full Firefox build is genuinely heavy: a ~5-10GB source checkout,
+# a specific Rust/Clang/NASM toolchain (bootstrapped via Mozilla's own
+# `./mach bootstrap`), 30GB+ free disk, and commonly 1-3+ hours of build
+# time even on fast hardware. Standard GitHub-hosted runners (2-core, ~14GB
+# disk headroom) are unlikely to comfortably finish this within their
+# per-job limits — expect to need a larger/self-hosted runner before this
+# workflow reliably completes. It's scaffolded here so the pipeline exists
+# and is ready to iterate on, not because a green run is expected yet.
+on:
+  workflow_dispatch:
+    inputs:
+      firefox_esr_branch:
+        description: "mozilla-esr branch to build against (e.g. mozilla-esr128)"
+        required: true
+        default: "mozilla-esr128"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone Firefox ESR source
+        run: |
+          # Mercurial is Firefox's canonical VCS; a git mirror also exists
+          # (github.com/mozilla-firefox/firefox) and is usually faster to
+          # shallow-clone from CI. Prefer the git mirror for CI speed.
+          git clone --depth 1 --branch "${{ inputs.firefox_esr_branch }}" \
+            https://github.com/mozilla-firefox/firefox.git firefox-src
+
+      - name: Apply BASILISK Browser patches
+        run: |
+          cd firefox-src
+          for patch in ../patches/*.patch; do
+            [ -e "$patch" ] || continue
+            echo "applying $patch"
+            git apply --verbose "$patch"
+          done
+
+      - name: Install branding + mozconfig
+        run: |
+          cp -r branding/basilisk-browser firefox-src/browser/branding/basilisk-browser
+          cp mozconfig firefox-src/mozconfig
+
+      - name: Bootstrap build toolchain
+        run: |
+          cd firefox-src
+          ./mach --no-interactive bootstrap --application-choice=browser
+
+      - name: Build
+        run: |
+          cd firefox-src
+          ./mach build
+
+      - name: Package
+        run: |
+          cd firefox-src
+          ./mach package
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: basilisk-browser-linux
+          path: firefox-src/obj-basilisk-browser/dist/*.tar.bz2
+          retention-days: 14
