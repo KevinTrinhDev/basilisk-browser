@@ -51,8 +51,14 @@ fi
 # happily install user.js into a profile Firefox hasn't opened in a year.
 # Pick by most recently used instead of by name, across both roots.
 echo
-read -r -p "Copy pref/user.js into your Firefox profile too? [y/N] " reply
-if [[ "$reply" =~ ^[Yy]$ ]]; then
+# Firefox's enterprise Preferences policy only accepts an allowlist of prefs.
+# Ten of the hardening prefs this project cares about (resistFingerprinting,
+# firstparty.isolate, donottrackheader, and others) are rejected with
+# "Preference not allowed for stability reasons" and were silently dropped,
+# so user.js is not an optional extra: it is the only thing that applies
+# them. Default to yes accordingly.
+read -r -p "Copy pref/user.js into your Firefox profile? [Y/n] " reply
+if [[ ! "$reply" =~ ^[Nn]$ ]]; then
   profile_dir=""
   newest_stamp=0
   for root in "$HOME/snap/firefox/common/.mozilla/firefox" "$HOME/.mozilla/firefox"; do
@@ -76,8 +82,8 @@ if [[ "$reply" =~ ^[Yy]$ ]]; then
   else
     echo "most recently used profile: $profile_dir"
     echo "  (last activity: $(date -d "@$newest_stamp" '+%Y-%m-%d %H:%M'))"
-    read -r -p "  install user.js there? [y/N] " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    read -r -p "  install user.js there? [Y/n] " confirm
+    if [[ ! "$confirm" =~ ^[Nn]$ ]]; then
       cp "$USER_JS_SRC" "$profile_dir/user.js"
       echo "installed: $profile_dir/user.js"
     else

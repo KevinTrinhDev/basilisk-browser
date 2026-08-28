@@ -29,6 +29,26 @@ works on Firefox for Linux, Windows, and macOS.
 .\scripts\install-windows.ps1
 ```
 
+### Why user.js is not optional
+
+Firefox's enterprise `Preferences` policy only accepts an allowlist of
+preferences. Ten of the prefs this project cares about, including
+`privacy.resistFingerprinting`, `privacy.firstparty.isolate` and
+`privacy.donottrackheader.enabled`, are refused with "Preference not
+allowed for stability reasons" and are silently dropped. Verified against
+Firefox 155 in `about:policies#errors`.
+
+Those prefs have been removed from `policy/policies.json`, since listing
+them there only created the impression they were being applied. They live
+in `pref/user.js`, which is therefore the only thing that applies them, and
+the install scripts now default that step to yes.
+
+The top-level policies are unaffected and still do real work:
+`DisableTelemetry`, `EnableTrackingProtection` (including cryptomining,
+fingerprinting and email tracking), `DisablePocket`, `DNSOverHTTPS`,
+`SanitizeOnShutdown` and the rest are applied normally. Only the
+free-form `Preferences` block was being filtered.
+
 ### If your Firefox is a snap (Ubuntu default)
 
 Snap Firefox keeps its profiles under

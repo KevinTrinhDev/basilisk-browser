@@ -31,8 +31,14 @@ if (-not $installed) {
 }
 
 Write-Host ""
-$reply = Read-Host "Copy pref/user.js into your Firefox profile too? [y/N]"
-if ($reply -match '^[Yy]') {
+# Firefox's enterprise Preferences policy only accepts an allowlist of prefs.
+# Ten of the hardening prefs this project cares about (resistFingerprinting,
+# firstparty.isolate, donottrackheader, and others) are rejected with
+# "Preference not allowed for stability reasons" and were silently dropped,
+# so user.js is not an optional extra: it is the only thing that applies
+# them. Default to yes accordingly.
+$reply = Read-Host "Copy pref/user.js into your Firefox profile? [Y/n]"
+if ($reply -notmatch '^[Nn]') {
   $profilesIni = "$Env:APPDATA\Mozilla\Firefox\Profiles"
   $profileDir = Get-ChildItem -Path $profilesIni -Directory -Filter "*.default*" -ErrorAction SilentlyContinue | Select-Object -First 1
   if ($null -eq $profileDir) {

@@ -29,8 +29,14 @@ if [[ "$installed_policy" == false ]]; then
 fi
 
 echo
-read -r -p "Copy pref/user.js into your Firefox profile too? [y/N] " reply
-if [[ "$reply" =~ ^[Yy]$ ]]; then
+# Firefox's enterprise Preferences policy only accepts an allowlist of prefs.
+# Ten of the hardening prefs this project cares about (resistFingerprinting,
+# firstparty.isolate, donottrackheader, and others) are rejected with
+# "Preference not allowed for stability reasons" and were silently dropped,
+# so user.js is not an optional extra: it is the only thing that applies
+# them. Default to yes accordingly.
+read -r -p "Copy pref/user.js into your Firefox profile? [Y/n] " reply
+if [[ ! "$reply" =~ ^[Nn]$ ]]; then
   profile_dir=$(find "$HOME/Library/Application Support/Firefox/Profiles" -maxdepth 1 -name "*.default*" -type d 2>/dev/null | head -1)
   if [[ -z "$profile_dir" ]]; then
     echo "no default profile found. Find yours via about:support -> Profile Folder,"
