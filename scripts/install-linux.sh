@@ -43,16 +43,66 @@ if [[ "$installed_policy" == false ]]; then
 fi
 
 # --- 2. Offer to copy user.js into the active profile ---
+#
+# Profile location depends on how Firefox was installed, and the snap keeps
+# its profiles under ~/snap/firefox/common/.mozilla/firefox. A machine that
+# used to run the .deb often still has a stale ~/.mozilla/firefox profile
+# sitting there from before the switch, so searching that path first would
+# happily install user.js into a profile Firefox hasn't opened in a year.
+# Pick by most recently used instead of by name, across both roots.
 echo
 read -r -p "Copy pref/user.js into your Firefox profile too? [y/N] " reply
 if [[ "$reply" =~ ^[Yy]$ ]]; then
-  profile_dir=$(find "$HOME/.mozilla/firefox" -maxdepth 1 -name "*.default*" -type d 2>/dev/null | head -1)
+  profile_dir=""
+  newest_stamp=0
+  for root in "$HOME/snap/firefox/common/.mozilla/firefox" "$HOME/.mozilla/firefox"; do
+    [[ -d "$root" ]] || continue
+    while IFS= read -r candidate; do
+      # A profile that has never been launched has no places.sqlite; skip it
+      # rather than treating a directory that merely exists as "active".
+      [[ -f "$candidate/places.sqlite" ]] || continue
+      stamp=$(stat -c %Y "$candidate/places.sqlite" 2>/dev/null || echo 0)
+      if (( stamp > newest_stamp )); then
+        newest_stamp=$stamp
+        profile_dir="$candidate"
+      fi
+    done < <(find "$root" -maxdepth 1 -mindepth 1 -type d 2>/dev/null)
+  done
+
   if [[ -z "$profile_dir" ]]; then
-    echo "no default profile found under ~/.mozilla/firefox — find yours via"
-    echo "about:support -> Profile Folder, then copy $USER_JS_SRC there yourself."
+    echo "no Firefox profile found under ~/snap/firefox/common/.mozilla/firefox"
+    echo "or ~/.mozilla/firefox — find yours via about:support -> Profile"
+    echo "Folder, then copy $USER_JS_SRC there yourself."
   else
-    cp "$USER_JS_SRC" "$profile_dir/user.js"
-    echo "installed: $profile_dir/user.js"
+    echo "most recently used profile: $profile_dir"
+    echo "  (last activity: $(date -d "@$newest_stamp" '+%Y-%m-%d %H:%M'))"
+    read -r -p "  install user.js there? [y/N] " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      cp "$USER_JS_SRC" "$profile_dir/user.js"
+      echo "installed: $profile_dir/user.js"
+    else
+      echo "skipped. Copy $USER_JS_SRC into your profile manually."
+    fi
+  fi
+fi
+
+# --- 3. Native messaging host, if the basilisk extension is set up ---
+#
+# Snap Firefox only gets read access to $HOME/.mozilla/firefox (for migrating
+# an old .deb profile). It cannot see $HOME/.mozilla/native-messaging-hosts,
+# which is where a non-snap Firefox looks, so a manifest installed only there
+# leaves the daemon bridge silently dead under the snap.
+if snap list firefox >/dev/null 2>&1; then
+  snap_nmh="$HOME/snap/firefox/common/.mozilla/native-messaging-hosts"
+  legacy_nmh="$HOME/.mozilla/native-messaging-hosts"
+  if [[ -f "$legacy_nmh/com.basilisk.agentdaemon.json" && ! -f "$snap_nmh/com.basilisk.agentdaemon.json" ]]; then
+    echo
+    echo "note: found a BASILISK native-messaging manifest at"
+    echo "  $legacy_nmh/com.basilisk.agentdaemon.json"
+    echo "which snap Firefox cannot read. Copying it to:"
+    echo "  $snap_nmh/"
+    mkdir -p "$snap_nmh"
+    cp "$legacy_nmh/com.basilisk.agentdaemon.json" "$snap_nmh/"
   fi
 fi
 

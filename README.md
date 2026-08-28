@@ -29,6 +29,27 @@ works on Firefox for Linux, Windows, and macOS.
 .\scripts\install-windows.ps1
 ```
 
+### If your Firefox is a snap (Ubuntu default)
+
+Snap Firefox keeps its profiles under
+`~/snap/firefox/common/.mozilla/firefox`, not `~/.mozilla/firefox`, and it
+is granted read-only access to the latter purely so it can migrate an old
+.deb profile. Two consequences worth knowing:
+
+- A machine that used to run the .deb usually still has a stale profile in
+  `~/.mozilla/firefox`. `scripts/install-linux.sh` picks the most recently
+  used profile across both locations rather than the first one matching
+  `*.default*`, so it will not write `user.js` into a profile Firefox has
+  not opened in a year.
+- Native messaging manifests in `~/.mozilla/native-messaging-hosts` are
+  invisible to snap Firefox. The basilisk daemon bridge needs its manifest
+  in `~/snap/firefox/common/.mozilla/native-messaging-hosts` instead. The
+  install script copies it across if it finds one in the old location.
+
+Policy hardening is unaffected: the snap reads
+`/etc/firefox/policies/policies.json`, which the install script already
+targets.
+
 **Tier 2: a real rebranded, source-patched build.** Scaffolded, not built
 yet. `mozconfig`, `branding/basilisk-browser/`, `patches/`, and
 `.github/workflows/build.yml` set up the actual pipeline LibreWolf uses:
