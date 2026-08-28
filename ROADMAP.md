@@ -14,11 +14,16 @@ here reads as promised work that isn't actually scheduled.
   build output and typecheck.
 - Ad/tracker blocklist rebuilt from real EasyList and EasyPrivacy data
   (basilisk repo, `scripts/update-blocklist.mjs`) instead of a small hand
-  curated list, capped at 20,000 domains to stay under Chrome's
-  declarativeNetRequest limits. This surfaced and fixed a real lookup
-  performance bug: the old linear scan took 8.3 seconds for 10,000 lookups
-  at this size; a Set-based label walk brought that to 8.4ms for 100,000
-  lookups.
+  curated list. This surfaced and fixed a real lookup performance bug: the
+  old linear scan took 8.3 seconds for 10,000 lookups at this size; a
+  Set-based label walk brought that to 8.4ms for 100,000 lookups.
+- The blocklist is no longer capped at 20,000 domains on Firefox. That cap
+  existed for Chrome's declarativeNetRequest static rule ceiling, which
+  never applied to Firefox's webRequest path, so it was discarding about
+  75,000 domains on the platform this project actually targets. The
+  generator now emits a full list for Firefox and a capped one for Chrome
+  from the same extraction run, and honors EasyList exception rules instead
+  of dropping them. Firefox coverage went from 20,000 to 95,355 domains.
 
 ## Performance and storage: planned for the tier-2 build (mozconfig)
 

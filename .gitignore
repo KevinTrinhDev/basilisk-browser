@@ -1,4 +1,5 @@
 firefox-src/
+.claude/
 obj-basilisk-browser/
 *.tar.bz2
 *.dmg

@@ -13,9 +13,17 @@ on:
   workflow_dispatch:
     inputs:
       firefox_esr_branch:
-        description: "mozilla-esr branch to build against (e.g. mozilla-esr128)"
+        description: "mozilla-esr branch to build against (e.g. mozilla-esr140)"
         required: true
-        default: "mozilla-esr128"
+        # ESR 128 reached end of life in 2025 and stopped receiving security
+        # updates. Building a *hardened privacy browser* on an EOL engine
+        # would ship known-unpatched CVEs, which defeats the entire point, so
+        # the default tracks the current ESR line instead.
+        #
+        # ESR 140 itself goes end of life 2026-09-29. Bump this to the
+        # successor ESR branch before then, and re-check
+        # https://whattrainisitnow.com/release/?version=esr when you do.
+        default: "mozilla-esr140"
 
 jobs:
   build-linux:
