@@ -68,6 +68,31 @@ something to fake:
   The workflow is ready (manual `workflow_dispatch` trigger) for whenever
   that's set up.
 
+## What tier 2 buys that tier 1 cannot
+
+Tier 1 hardening gets you most of the privacy win with no compiling, so it
+is fair to ask what the full build is actually for. Beyond a distinct
+binary you can hand to someone and the usual PGO/LTO speed gains, there is
+one capability tier 1 structurally cannot provide:
+
+**Installing the BASILISK extension without Mozilla in the loop.** Stock
+release Firefox refuses unsigned extensions, and
+`xpinstall.signatures.required` does not override that on a release build.
+So distributing the extension to anyone running stock Firefox means
+uploading the `.xpi` to Mozilla's signing service first. That works, and
+the signed result can be hosted on GitHub rather than listed on
+addons.mozilla.org, but it still puts a third party in the middle of a
+project built specifically to avoid required third parties.
+
+A tier-2 build sets `MOZ_REQUIRE_SIGNING=` along with
+`--with-unsigned-addon-scopes=app,system` and `--allow-addon-sideload`
+(see `mozconfig`), the same combination LibreWolf ships. On that build,
+"download the `.xpi` from GitHub and install it" just works. The tradeoff
+is stated in the mozconfig: it also allows installing a malicious unsigned
+extension, and users who want Mozilla's enforcement back can turn
+`xpinstall.signatures.required` on, which does work on a build made this
+way.
+
 ## Why not build a new engine from scratch
 
 Because that isn't "fork and revamp," that's competing with Chromium and

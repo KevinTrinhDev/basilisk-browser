@@ -81,6 +81,21 @@ list, concretely plannable:
   history without a vendor in the loop. Real and bounded, just not
   written up yet.
 
+## Distribution: why the tier-2 build is load bearing
+
+Worth recording, because it is easy to read tier 2 as cosmetic. The
+extension cannot be permanently installed on stock release Firefox unless
+Mozilla signs it. Unlisted signing exists and is the right near-term
+answer (it is self-distribution, not a marketplace listing, so the `.xpi`
+is hosted on GitHub and never appears on addons.mozilla.org), but it is
+still a required dependency on a third party.
+
+The tier-2 build removes that dependency outright via `MOZ_REQUIRE_SIGNING=`
+and friends in `mozconfig`. That makes tier 2 the thing that turns "you
+can try this" into "you can ship this to other people without asking
+anyone's permission," which is the actual decentralization claim this
+project can honestly make.
+
 ## What actually sets this apart
 
 Being honest about the landscape: LibreWolf, Mullvad Browser, and Brave

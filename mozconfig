@@ -21,6 +21,31 @@ ac_add_options --with-branding=browser/branding/basilisk-browser
 ac_add_options --with-app-name=basilisk-browser
 ac_add_options --with-app-basename=BasiliskBrowser
 
+# Accept extensions that Mozilla has not signed.
+#
+# This is the flag that makes "download the .xpi from GitHub and run it"
+# actually work, and it is the one thing tier 1 fundamentally cannot do:
+# stock release Firefox refuses unsigned extensions outright, and
+# xpinstall.signatures.required does not override that on a release build.
+# Without this, shipping the BASILISK extension to anyone means routing the
+# .xpi through Mozilla's signing service first, which puts a third party in
+# the middle of a project whose whole point is not needing one.
+#
+# LibreWolf ships exactly this combination for exactly this reason.
+# MOZ_REQUIRE_SIGNING must be empty (not 0) because the build system tests
+# whether the variable is set at all, and the two configure flags are what
+# let an unsigned add-on actually be installed and sideloaded once the
+# hard requirement is lifted.
+#
+# The tradeoff is real and worth stating plainly: this lets a user install
+# any unsigned extension, including a malicious one, so it trades a
+# Mozilla-enforced guarantee for user control. Users who want the
+# enforcement back can set xpinstall.signatures.required to true in
+# about:config, which does work on a build made this way.
+ac_add_options MOZ_REQUIRE_SIGNING=
+ac_add_options --with-unsigned-addon-scopes=app,system
+ac_add_options --allow-addon-sideload
+
 # Telemetry / data collection off at compile time (belt-and-suspenders with
 # policy/policies.json, which handles this at runtime for stock Firefox too)
 ac_add_options MOZ_TELEMETRY_REPORTING=
